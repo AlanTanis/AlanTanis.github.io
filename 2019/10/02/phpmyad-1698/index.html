@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+  <link rel="mask-icon" href="/favicons/safari_pinned_tab.svg" color="#222">
+  <link rel="manifest" href="/favicons/site.manifest">
+  <meta name="msapplication-config" content="/favicons/browserconfig.xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":"ture","show_result":"ture","style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="0x00 问题起因为了方便操作数据库，我部署了 phpMyAdmin。但在使用 root 用户登录的时候，却提示：  mysqli_real_connect(): (hy000&#x2F;1698): access denied for user ‘root’@’localhost’  0x01 解决方案在检索了相关文章和资料后，了解到 MySQL 5.7+ 的版本，由于在安全机制上有一定的改动，因此默认情">
+<meta property="og:type" content="article">
+<meta property="og:title" content="phpMyAdmin 报 1698 错误">
+<meta property="og:url" content="http://example.com/2019/10/02/phpmyad-1698/index.html">
+<meta property="og:site_name" content="K162">
+<meta property="og:description" content="0x00 问题起因为了方便操作数据库，我部署了 phpMyAdmin。但在使用 root 用户登录的时候，却提示：  mysqli_real_connect(): (hy000&#x2F;1698): access denied for user ‘root’@’localhost’  0x01 解决方案在检索了相关文章和资料后，了解到 MySQL 5.7+ 的版本，由于在安全机制上有一定的改动，因此默认情">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-02T10:22:03.000Z">
+<meta property="article:modified_time" content="2020-01-29T10:43:47.810Z">
+<meta property="article:author" content="Alan Tanis">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/10/02/phpmyad-1698/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>phpMyAdmin 报 1698 错误 | K162</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">K162</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Starwalker, Stardust.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/02/phpmyad-1698/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          phpMyAdmin 报 1698 错误
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-02 18:22:03" itemprop="dateCreated datePublished" datetime="2019-10-02T18:22:03+08:00">2019-10-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-29 18:43:47" itemprop="dateModified" datetime="2020-01-29T18:43:47+08:00">2020-01-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="0x00-问题起因"><a href="#0x00-问题起因" class="headerlink" title="0x00 问题起因"></a>0x00 问题起因</h2><p>为了方便操作数据库，我部署了 phpMyAdmin。但在使用 root 用户登录的时候，却提示：</p>
+<blockquote>
+<p>mysqli_real_connect(): (hy000/1698): access denied for user ‘root’@’localhost’</p>
+</blockquote>
+<h2 id="0x01-解决方案"><a href="#0x01-解决方案" class="headerlink" title="0x01 解决方案"></a>0x01 解决方案</h2><p>在检索了相关文章和资料后，了解到 MySQL 5.7+ 的版本，由于在安全机制上有一定的改动，因此默认情况下，命令行需要使用 <code>sudo</code> 来登录 root 用户。</p>
+<p>StackExchange 上，用户 Rael Gugelmin Cunha 提供了一种解决方案，思路是：创建一个赋予了足够权限的新用户。<a href="#ref_1"><sup>1</sup></a></p>
+<p>具体步骤如下：</p>
+<p>1、创建用户，并使用密码认证：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">&#x27;new_user&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;your_password&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>2、赋予权限</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">TO</span> <span class="string">&#x27;new_user&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> OPTION;</span><br></pre></td></tr></table></figure>
+<p>但是我觉得 <code>WITH GRANT OPTION</code> 可有可无。</p>
+<p>3、刷新权限</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></table></figure>
+<h2 id="0x02-新的问题"><a href="#0x02-新的问题" class="headerlink" title="0x02 新的问题"></a>0x02 新的问题</h2><p>创建用户后，我成功地使用新用户，通过 phpMyAdmin 登录了数据库。然而，同时我却发现，root 用户也能登录了。</p>
+<p><strong>为什么创建了新用户后，root 用户也能登录了？</strong></p>
+<h2 id="0x03-MySQL-安全组件和插件"><a href="#0x03-MySQL-安全组件和插件" class="headerlink" title="0x03 MySQL 安全组件和插件"></a>0x03 MySQL 安全组件和插件</h2><p>我开始摸索，MySQL 5.7+ 版本的 root 用户的安全机制上，到底在哪里出现了变动。</p>
+<h4 id="1-Socket-Peer-Credential-Authentication"><a href="#1-Socket-Peer-Credential-Authentication" class="headerlink" title="1. Socket Peer-Credential Authentication"></a>1. Socket Peer-Credential Authentication</h4><p>同样是在 StackExchange 上，用户 Todor 提到：</p>
+<blockquote>
+<p>If you install 5.7 and don’t provide a password to the <code>root</code> user, it will use the <code>auth_socket</code> plugin. That plugin doesn’t care and doesn’t need a password. It just checks if the user is connecting using a UNIX socket and then compares the username.<a href="#ref_2"><sup>2</sup></a></p>
+</blockquote>
+<p>在没有给 root 用户设置新密码前，root 用户默认使用 <code>auth_socket</code> 安全插件<a href="#ref_3"><sup>3</sup></a>。<code>auth_socket</code> 通过检查当前用户是否使用 UNIX socket 并比较用户名来进行认证。</p>
+<p>在 <code>user</code> 表中，就记录有相关的信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; select user,host,plugin from mysql.user;</span><br><span class="line">+------+-----------+-------------+</span><br><span class="line">| user | host      | plugin      |</span><br><span class="line">+------+-----------+-------------+</span><br><span class="line">| root | localhost | unix_socket |</span><br><span class="line">+------+-----------+-------------+</span><br></pre></td></tr></table></figure>
+<p>换言之，对于我当前的 root 用户登录数据库，如果使用 <code>unix_socket</code> 安全插件，那就只需要：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql</span><br></pre></td></tr></table></figure>
+<h4 id="2-Native-Authentication"><a href="#2-Native-Authentication" class="headerlink" title="2. Native Authentication"></a>2. Native Authentication</h4><p>在此之前，我都是使用 <code>mysql_native_password</code> 这种较为传统的方式。</p>
+<p>而且平时，我习惯在 MySQL 环境中使用 <code>SET PASSWORD</code> 命令修改密码：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> PASSWORD <span class="keyword">for</span> root<span class="variable">@localhost</span> <span class="operator">=</span> password(<span class="string">&#x27;new_password&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>在执行完命令后，用户相应的 <code>plugin</code> 就会变成 <code>mysql_native_password</code>，并在 <code>FLUSH PRIVILEGES</code> 后生效。</p>
+<h2 id="0x04-为什么之前没有发现"><a href="#0x04-为什么之前没有发现" class="headerlink" title="0x04 为什么之前没有发现"></a>0x04 为什么之前没有发现</h2><p>想来想去，应该就是自己当时在**修改了 root 密码之后，没有及时 <code>FLUSH PRIVILEGES</code>**，且平时一直在用 <code>sudo mysql -u root -p</code> 登录数据库，所以没有意识到这些问题。</p>
+<h2 id="0x05-另外的解决方案"><a href="#0x05-另外的解决方案" class="headerlink" title="0x05 另外的解决方案"></a>0x05 另外的解决方案</h2><p>所以，除了创建新用户之外，把用户的安全认证方式从 <code>UNIX_socket</code> 修改成 <code>mysql_native_password</code> 也是一种办法。</p>
+<p>因此可以通过一行命令来实现：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span> <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;your_password&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>当然，这种情况下，也可以设置一个空密码。如果修改 root 用户时，提示权限不足，可检查下是否是 <code>sudo mysql</code> 登录的。</p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://askubuntu.com/questions/763336/cannot-enter-phpmyadmin-as-root-mysql-5-7">askubuntu, Cannot enter phpmyadmin as root (MySQL 5.7)</a></a><br><a name="ref_2">[2] <a target="_blank" rel="noopener" href="https://askubuntu.com/questions/766334/cant-login-as-mysql-user-root-from-normal-user-account-in-ubuntu-16-04#">askubuntu, can’t login as mysql user root from normal user account in ubuntu 16.04</a></a><br><a name="ref_3">[3] <a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/socket-pluggable-authentication.html">Oracle, MySQL 8.0 Reference Manual</a></a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/21/swap/" rel="prev" title="CentOS 7 创建 Swap 空间">
+      <i class="fa fa-chevron-left"></i> CentOS 7 创建 Swap 空间
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/31/autoload-classmap/" rel="next" title="Laravel Seeder 报错：Target class [BarTableSeeder does not exist]">
+      Laravel Seeder 报错：Target class [BarTableSeeder does not exist] <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-%E9%97%AE%E9%A2%98%E8%B5%B7%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">0x00 问题起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">0x01 解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-%E6%96%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">0x02 新的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-MySQL-%E5%AE%89%E5%85%A8%E7%BB%84%E4%BB%B6%E5%92%8C%E6%8F%92%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">0x03 MySQL 安全组件和插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Socket-Peer-Credential-Authentication"><span class="nav-number">4.0.1.</span> <span class="nav-text">1. Socket Peer-Credential Authentication</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Native-Authentication"><span class="nav-number">4.0.2.</span> <span class="nav-text">2. Native Authentication</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B9%8B%E5%89%8D%E6%B2%A1%E6%9C%89%E5%8F%91%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">0x04 为什么之前没有发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-%E5%8F%A6%E5%A4%96%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">6.</span> <span class="nav-text">0x05 另外的解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">6.0.1.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alan Tanis"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Alan Tanis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Alan_Tanis" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Alan_Tanis" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/giftalan" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;giftalan" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/AlanTanis" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;AlanTanis" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://steamcommunity.com/profiles/76561198098176366/" title="Steam → http:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198098176366&#x2F;" rel="noopener" target="_blank"><i class="fab fa-steam-symbol fa-fw"></i>Steam</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alan Tanis</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
