@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+  <link rel="mask-icon" href="/favicons/safari_pinned_tab.svg" color="#222">
+  <link rel="manifest" href="/favicons/site.manifest">
+  <meta name="msapplication-config" content="/favicons/browserconfig.xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="关于 BFC根据 Mozilla 的 MDN 文档1中关于 BFC（Box Formatting Content，块级格式化上下文）的说明：  A block formatting context is a part of a visual CSS rendering of a web page. It’s the region in which the layout of block boxes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSS 浮动：BFC 规范和清除浮动">
+<meta property="og:url" content="http://example.com/2021/06/04/CSSfloat/index.html">
+<meta property="og:site_name" content="K162">
+<meta property="og:description" content="关于 BFC根据 Mozilla 的 MDN 文档1中关于 BFC（Box Formatting Content，块级格式化上下文）的说明：  A block formatting context is a part of a visual CSS rendering of a web page. It’s the region in which the layout of block boxes">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2021/06/04/CSSfloat/images/noBFC.png">
+<meta property="og:image" content="http://example.com/2021/06/04/CSSfloat/images/BFC.png">
+<meta property="og:image" content="http://example.com/2021/06/04/CSSfloat/images/noClear.png">
+<meta property="og:image" content="http://example.com/2021/06/04/CSSfloat/images/Clear.png">
+<meta property="article:published_time" content="2021-06-04T02:53:54.000Z">
+<meta property="article:modified_time" content="2021-06-04T03:10:20.862Z">
+<meta property="article:author" content="Alan Tanis">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="CSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/06/04/CSSfloat/images/noBFC.png">
+
+<link rel="canonical" href="http://example.com/2021/06/04/CSSfloat/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSS 浮动：BFC 规范和清除浮动 | K162</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">K162</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Starwalker, Stardust.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/04/CSSfloat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSS 浮动：BFC 规范和清除浮动
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-04 10:53:54 / 修改时间：11:10:20" itemprop="dateCreated datePublished" datetime="2021-06-04T10:53:54+08:00">2021-06-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/06/04/CSSfloat/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/06/04/CSSfloat/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="关于-BFC"><a href="#关于-BFC" class="headerlink" title="关于 BFC"></a>关于 BFC</h2><p>根据 Mozilla 的 MDN 文档<a href="#ref_1"><sup>1</sup></a>中关于 BFC（Box Formatting Content，块级格式化上下文）的说明：</p>
+<blockquote>
+<p>A <strong>block formatting context</strong> is a part of a visual CSS rendering of a web page. It’s the region in which the layout of block boxes occurs and in which floats interact with other elements.</p>
+<p>…</p>
+<p>Formatting contexts affect layout, but typically, we create a new block formatting context for the positioning and clearing floats rather than changing the layout, because an element that establishes a new block formatting context will:</p>
+<ul>
+<li>contain internal floats.</li>
+<li>exclude external floats.</li>
+<li>suppress margin collapsing.</li>
+</ul>
+</blockquote>
+<p>讲简单点，<strong>BFC 是页面上的一个独立容器，内部的元素不会影响外部的元素，反之亦然。</strong></p>
+<p>而盒子是否形成 BFC，<strong>对元素的 CSS 浮动有重要影响</strong>。同时，BFC 还能取消 margin 塌陷（margin collapsing），以及阻止元素被 float 的元素覆盖。</p>
+<h3 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>一个没有形成 BFC 的例子：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span>	<span class="comment">&lt;!-- 没有设置 height --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- p 标签设置了 height 和 float --&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果一个父元素（例子中的 <code>div</code> 标签）不设置 <code>height</code>，而内部的子元素都为 <code>float</code> 时，就无法撑起自身：</p>
+<img src="images/noBFC.png" alt="noBFC" style="zoom: 67%;" />
+
+<h3 id="创建-BFC"><a href="#创建-BFC" class="headerlink" title="创建 BFC"></a>创建 BFC</h3><p>创建 BFC 的方法有很多，从文档的根元素 <code>&lt;html&gt;</code> 标签，到设置 <code>column-span: all;</code> ，具体可参考 Mozilla 的 MDN 文档<a href="#ref_1"><sup>1</sup></a>中的详细描述。</p>
+<p>但是，针对上述例子中的场景，创建 BFC 有 4 种典型的方法：</p>
+<ol>
+<li>父元素 添加属性 <code>overflow: hidden;</code> <strong>（推荐）</strong></li>
+<li>父元素 <code>position</code> 属性的值不是 <code>static</code> 或 <code>relative</code> <strong>（推荐）</strong></li>
+<li>父元素 <code>float</code> 属性的值不是 <code>none</code></li>
+<li>父元素 <code>display</code> 的值是 <code>inline-block</code>, <code>flex</code> 或 <code>inline-flex</code></li>
+</ol>
+<p>效果如下：</p>
+<img src="images/BFC.png" alt="BFC" style="zoom:67%;" />
+
+<h2 id="清除浮动"><a href="#清除浮动" class="headerlink" title="清除浮动"></a>清除浮动</h2><p>浮动一定要封闭到一个盒子中，否则会对页面其他元素产生影响。</p>
+<h3 id="举个栗子-1"><a href="#举个栗子-1" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>一个没有清除浮动的例子：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span>	</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- p 标签设置了 float --&gt;</span></span><br></pre></td></tr></table></figure>
+<p>原因就在于 <code>div</code> 没有形成 BFC，导致子元素无法形成两行：</p>
+<img src="images/noClear.png" alt="noClear" style="zoom: 50%;" />
+
+<h3 id="清除浮动的方法"><a href="#清除浮动的方法" class="headerlink" title="清除浮动的方法"></a>清除浮动的方法</h3><p>如果父元素的<strong>高度固定</strong>，那么直接设置 <code>height</code> 属性即可。</p>
+<p>但是，父元素高度如果不固定（如，元素内容是动态的），那么就不能设置固定的 <code>height</code> 值。此时，也有几个典型的方法：</p>
+<h4 id="1-父元素形成-BFC"><a href="#1-父元素形成-BFC" class="headerlink" title="1. 父元素形成 BFC"></a>1. 父元素形成 BFC</h4><p>让父元素形成 BFC，如：设置 <code>overflow: hidden;</code>。</p>
+<h4 id="2-设置-clear-both-属性"><a href="#2-设置-clear-both-属性" class="headerlink" title="2. 设置 clear:both; 属性"></a>2. 设置 <code>clear:both;</code> 属性</h4><p>给<strong>后面的父元素</strong>设置 <code>clear:both;</code> 。 <code>clear</code> 属性用来清除浮动对自己的影响，<code>both</code> 参数表示左右浮动都清除。 </p>
+<p>但由于前面的父元素依旧没有 <code>height</code>，可能会在后续元素定位上产生些问题。</p>
+<h4 id="3-使用-after-伪元素（推荐）"><a href="#3-使用-after-伪元素（推荐）" class="headerlink" title="3. 使用 ::after 伪元素（推荐）"></a>3. 使用 <code>::after</code> 伪元素（推荐）</h4><p>使用 <code>::after</code> 伪元素，给父元素最后添加一个子元素，并且给 <code>::after</code> 设置 <code>clear:both</code>：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">::after</span> &#123;</span><br><span class="line">	<span class="attribute">content</span>: <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="attribute">clear</span>: both;</span><br><span class="line">	<span class="attribute">display</span>: block; <span class="comment">/* 别忘记设置 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<img src="images/Clear.png" alt="Clear" style="zoom:50%;" />
+
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context">MDN contributors, Block formatting context</a></a><br>[2] <a target="_blank" rel="noopener" href="https://www.imooc.com/">慕课网</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag"># 前端</a>
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/31/BFSandPath/" rel="prev" title="图的遍历与路径记录">
+      <i class="fa fa-chevron-left"></i> 图的遍历与路径记录
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E-BFC"><span class="nav-number">1.</span> <span class="nav-text">关于 BFC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E6%A0%97%E5%AD%90"><span class="nav-number">1.1.</span> <span class="nav-text">举个栗子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-BFC"><span class="nav-number">1.2.</span> <span class="nav-text">创建 BFC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">清除浮动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E6%A0%97%E5%AD%90-1"><span class="nav-number">2.1.</span> <span class="nav-text">举个栗子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%85%E9%99%A4%E6%B5%AE%E5%8A%A8%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">清除浮动的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%88%B6%E5%85%83%E7%B4%A0%E5%BD%A2%E6%88%90-BFC"><span class="nav-number">2.2.1.</span> <span class="nav-text">1. 父元素形成 BFC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%AE%BE%E7%BD%AE-clear-both-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.2.</span> <span class="nav-text">2. 设置 clear:both; 属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8-after-%E4%BC%AA%E5%85%83%E7%B4%A0%EF%BC%88%E6%8E%A8%E8%8D%90%EF%BC%89"><span class="nav-number">2.2.3.</span> <span class="nav-text">3. 使用 ::after 伪元素（推荐）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.3.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Alan Tanis"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Alan Tanis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Alan_Tanis" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Alan_Tanis" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/giftalan" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;giftalan" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/AlanTanis" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;AlanTanis" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://steamcommunity.com/profiles/76561198098176366/" title="Steam → http:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198098176366&#x2F;" rel="noopener" target="_blank"><i class="fab fa-steam-symbol fa-fw"></i>Steam</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alan Tanis</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'lKK1hv45z4gwVD0tJODu8N9E-MdYXbMMI',
+      appKey     : 'fJnKvOVDXf3Pb8A14zpMdygA',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

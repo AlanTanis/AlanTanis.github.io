@@ -158,6 +158,133 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/04/CSSfloat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/04/CSSfloat/" class="post-title-link" itemprop="url">CSS 浮动：BFC 规范和清除浮动</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-04 10:53:54 / 修改时间：11:10:20" itemprop="dateCreated datePublished" datetime="2021-06-04T10:53:54+08:00">2021-06-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/06/04/CSSfloat/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/06/04/CSSfloat/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="关于-BFC"><a href="#关于-BFC" class="headerlink" title="关于 BFC"></a>关于 BFC</h2><p>根据 Mozilla 的 MDN 文档<a href="#ref_1"><sup>1</sup></a>中关于 BFC（Box Formatting Content，块级格式化上下文）的说明：</p>
+<blockquote>
+<p>A <strong>block formatting context</strong> is a part of a visual CSS rendering of a web page. It’s the region in which the layout of block boxes occurs and in which floats interact with other elements.</p>
+<p>…</p>
+<p>Formatting contexts affect layout, but typically, we create a new block formatting context for the positioning and clearing floats rather than changing the layout, because an element that establishes a new block formatting context will:</p>
+<ul>
+<li>contain internal floats.</li>
+<li>exclude external floats.</li>
+<li>suppress margin collapsing.</li>
+</ul>
+</blockquote>
+<p>讲简单点，<strong>BFC 是页面上的一个独立容器，内部的元素不会影响外部的元素，反之亦然。</strong></p>
+<p>而盒子是否形成 BFC，<strong>对元素的 CSS 浮动有重要影响</strong>。同时，BFC 还能取消 margin 塌陷（margin collapsing），以及阻止元素被 float 的元素覆盖。</p>
+<h3 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>一个没有形成 BFC 的例子：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span>	<span class="comment">&lt;!-- 没有设置 height --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- p 标签设置了 height 和 float --&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果一个父元素（例子中的 <code>div</code> 标签）不设置 <code>height</code>，而内部的子元素都为 <code>float</code> 时，就无法撑起自身：</p>
+<img src="images/noBFC.png" alt="noBFC" style="zoom: 67%;" />
+
+<h3 id="创建-BFC"><a href="#创建-BFC" class="headerlink" title="创建 BFC"></a>创建 BFC</h3><p>创建 BFC 的方法有很多，从文档的根元素 <code>&lt;html&gt;</code> 标签，到设置 <code>column-span: all;</code> ，具体可参考 Mozilla 的 MDN 文档<a href="#ref_1"><sup>1</sup></a>中的详细描述。</p>
+<p>但是，针对上述例子中的场景，创建 BFC 有 4 种典型的方法：</p>
+<ol>
+<li>父元素 添加属性 <code>overflow: hidden;</code> <strong>（推荐）</strong></li>
+<li>父元素 <code>position</code> 属性的值不是 <code>static</code> 或 <code>relative</code> <strong>（推荐）</strong></li>
+<li>父元素 <code>float</code> 属性的值不是 <code>none</code></li>
+<li>父元素 <code>display</code> 的值是 <code>inline-block</code>, <code>flex</code> 或 <code>inline-flex</code></li>
+</ol>
+<p>效果如下：</p>
+<img src="images/BFC.png" alt="BFC" style="zoom:67%;" />
+
+<h2 id="清除浮动"><a href="#清除浮动" class="headerlink" title="清除浮动"></a>清除浮动</h2><p>浮动一定要封闭到一个盒子中，否则会对页面其他元素产生影响。</p>
+<h3 id="举个栗子-1"><a href="#举个栗子-1" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>一个没有清除浮动的例子：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span>	</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- p 标签设置了 float --&gt;</span></span><br></pre></td></tr></table></figure>
+<p>原因就在于 <code>div</code> 没有形成 BFC，导致子元素无法形成两行：</p>
+<img src="images/noClear.png" alt="noClear" style="zoom: 50%;" />
+
+<h3 id="清除浮动的方法"><a href="#清除浮动的方法" class="headerlink" title="清除浮动的方法"></a>清除浮动的方法</h3><p>如果父元素的<strong>高度固定</strong>，那么直接设置 <code>height</code> 属性即可。</p>
+<p>但是，父元素高度如果不固定（如，元素内容是动态的），那么就不能设置固定的 <code>height</code> 值。此时，也有几个典型的方法：</p>
+<h4 id="1-父元素形成-BFC"><a href="#1-父元素形成-BFC" class="headerlink" title="1. 父元素形成 BFC"></a>1. 父元素形成 BFC</h4><p>让父元素形成 BFC，如：设置 <code>overflow: hidden;</code>。</p>
+<h4 id="2-设置-clear-both-属性"><a href="#2-设置-clear-both-属性" class="headerlink" title="2. 设置 clear:both; 属性"></a>2. 设置 <code>clear:both;</code> 属性</h4><p>给<strong>后面的父元素</strong>设置 <code>clear:both;</code> 。 <code>clear</code> 属性用来清除浮动对自己的影响，<code>both</code> 参数表示左右浮动都清除。 </p>
+<p>但由于前面的父元素依旧没有 <code>height</code>，可能会在后续元素定位上产生些问题。</p>
+<h4 id="3-使用-after-伪元素（推荐）"><a href="#3-使用-after-伪元素（推荐）" class="headerlink" title="3. 使用 ::after 伪元素（推荐）"></a>3. 使用 <code>::after</code> 伪元素（推荐）</h4><p>使用 <code>::after</code> 伪元素，给父元素最后添加一个子元素，并且给 <code>::after</code> 设置 <code>clear:both</code>：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.clearfix</span><span class="selector-pseudo">::after</span> &#123;</span><br><span class="line">	<span class="attribute">content</span>: <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="attribute">clear</span>: both;</span><br><span class="line">	<span class="attribute">display</span>: block; <span class="comment">/* 别忘记设置 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<img src="images/Clear.png" alt="Clear" style="zoom:50%;" />
+
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context">MDN contributors, Block formatting context</a></a><br>[2] <a target="_blank" rel="noopener" href="https://www.imooc.com/">慕课网</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/31/BFSandPath/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -183,7 +310,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-31 21:25:01 / 修改时间：21:45:58" itemprop="dateCreated datePublished" datetime="2021-01-31T21:25:01+08:00">2021-01-31</time>
+              <time title="创建时间：2021-01-31 21:25:01 / 修改时间：21:47:45" itemprop="dateCreated datePublished" datetime="2021-01-31T21:25:01+08:00">2021-01-31</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -222,7 +349,7 @@
       
           <p>对图进行遍历时，我们往往会建立一个数组 <code>vis[]</code>，用来记录是否访问过某一结点，或（在广度优先遍历时）建立一个数组 <code>inq[]</code> ，用来记录结点是否进入过队列。</p>
 <p>但如果需要获得遍历过程中，从起始结点到各个结点的路径，可以通过记录<strong>结点的前驱</strong>来实现。</p>
-<h3 id="关联数组"><a href="#关联数组" class="headerlink" title="关联数组"></a>关联数组</h3><p>在 PHP 的实现中，可以直接将数组 <code>vis[]</code> （或是 <code>inq[]</code>） 换作一个关联数组，用来记录结点前驱。其中，下一个结点 <code>$next</code> 作为关联数组的键，<code>$node</code> 当前结点为值：</p>
+<h3 id="PHP-关联数组"><a href="#PHP-关联数组" class="headerlink" title="PHP 关联数组"></a>PHP 关联数组</h3><p>在 PHP 的实现中，可以直接将数组 <code>vis[]</code> （或是 <code>inq[]</code>） 换作一个关联数组，用来记录结点前驱。其中，下一个结点 <code>$next</code> 作为关联数组的键，<code>$node</code> 当前结点为值：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$inq</span>[ <span class="variable">$next</span> ] = <span class="variable">$node</span>;</span><br><span class="line"><span class="comment">// $inq 	关联数组</span></span><br><span class="line"><span class="comment">// $next 	下一个结点</span></span><br><span class="line"><span class="comment">// $node	当前结点，即作为下一个结点的前驱</span></span><br></pre></td></tr></table></figure>
 <p>遍历过程中，如果要确认某个结点是否被访问过（或是否进入过队列），可使用 <code>array_key_exists(key, array)</code> 函数，检查某一个数组中是否存在某一个键名。例如，若能在 <code>$inq</code> 中找到名为 <code>$next</code> 的键（即返回 <code>true</code>），那就说明 <code>$next</code> 已经进入过队列：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">array_key_exists(<span class="variable">$next</span>, <span class="variable">$inq</span>);</span><br><span class="line"><span class="comment">// $next	下一个结点，即关联数组的键</span></span><br><span class="line"><span class="comment">// $inq		关联数组</span></span><br></pre></td></tr></table></figure>
@@ -1159,115 +1286,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2019/06/26/esp8266-at-uart/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Alan Tanis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="K162">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/06/26/esp8266-at-uart/" class="post-title-link" itemprop="url">ESP8266 在 AT+UART_DEF 后无响应</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-06-26 21:08:33" itemprop="dateCreated datePublished" datetime="2019-06-26T21:08:33+08:00">2019-06-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-30 21:27:15" itemprop="dateModified" datetime="2020-01-30T21:27:15+08:00">2020-01-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2019/06/26/esp8266-at-uart/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2019/06/26/esp8266-at-uart/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="起因和症状"><a href="#起因和症状" class="headerlink" title="起因和症状"></a>起因和症状</h2><p>我将 ESP8266 与 Arduino UNO 的软串口连接，搭配 AT 指令进行使用。但由于 Arduino 的软串口无法到达 115200 波特率的传输速度，于是我参考乐鑫的文档<a href="#ref_1"><sup>1</sup></a>，根据其对 UART 配置描述提供的指令样例，给 ESP8266 发送了如下指令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AT+UART_DEF&#x3D;4800,8,1,0,3</span><br></pre></td></tr></table></figure>
-<p>紧接着，在 ESP8266 回复了一句 <code>OK</code> 后——ESP8266，完全沉默了。</p>
-<p>在任何波特率，都无法获得 ESP8266 的响应。除了在 74880 波特率下能获得上电的系统日志信息。</p>
-<h2 id="问题梳理"><a href="#问题梳理" class="headerlink" title="问题梳理"></a>问题梳理</h2><p>在浏览了 Arduino 社区中遇到同样问题的相关讨论<a href="#ref_2"><sup>2</sup></a>，以及 StackOverflow<a href="#ref_3"><sup>3</sup></a> 中的相关问答后，我意识到，问题可能出在指令中最后一个参数上。</p>
-<p>我重新翻阅了乐鑫的文档。文档中对 <code>AT+UART_DEF</code> 是这样描述的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AT+UART_DEF&#x3D;&lt;baudrate&gt;,&lt;databits&gt;,&lt;stopbits&gt;,&lt;parity&gt;,&lt;flow control&gt;</span><br></pre></td></tr></table></figure>
-<p>其中，<code>&lt;flow control&gt;</code> 为流控设置参数：</p>
-<blockquote>
-<p>0：不使能流控<br>1：使能 RTS<br>2：使能 CTS<br>3：同时使能 RTS 和 CTS</p>
-</blockquote>
-<p>文档关于这点也给出了相应的注意提示：</p>
-<blockquote>
-<p>使用流控需要硬件支持流控：<br>MTCK 为 UART0 CTS；<br>MTDO 为 UART0 RTS</p>
-</blockquote>
-<p>我使用的 ESP8266 是由安信可（Ai-Thinker）生产的 ESP-01S 模块。模块仅有的 8 个引脚中，没有 RTS 和 CTS 引脚。也就是说，<strong>在我设置了使能 RTS 和 CTS 进行流控后，在硬件上我却无法使用 RTS 和 CTS，所以 ESP8266 也就没有了响应</strong>。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p><del>刷机</del> 刷固件。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>ESP8266 不使能 CTS 和 RTS 流控，设置波特率可使用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AT+UART_DEF&#x3D;9600,8,1,0,0</span><br></pre></td></tr></table></figure>
-<p>也可以使用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AT+CIOBAUD&#x3D;9600</span><br></pre></td></tr></table></figure>
-<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://www.espressif.com/sites/default/files/documentation/4a-esp8266_at_instruction_set_cn.pdf">Espressif. ESP8266 Non-OS SDK AT 指令集</a></a><br><a name="ref_2">[2] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/23690124/vagrant-up-timeout">Arduino Forum. I changed ESP8266 Baud rate to 9600 - Now No communication !!!</a></a><br><a name="ref_3">[3] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/34248581/set-baud-rate-to-esp8266-at-9600">StackOverflow. Set baud rate to esp8266 at 9600</a></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1339,7 +1357,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-count">19</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1352,7 +1370,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
