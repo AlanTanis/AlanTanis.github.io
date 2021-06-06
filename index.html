@@ -158,6 +158,148 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/06/PHPPerformanceOptimization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/06/PHPPerformanceOptimization/" class="post-title-link" itemprop="url">PHP 性能优化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-06 08:03:09 / 修改时间：08:10:07" itemprop="dateCreated datePublished" datetime="2021-06-06T08:03:09+08:00">2021-06-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/06/06/PHPPerformanceOptimization/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/06/06/PHPPerformanceOptimization/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>PHP 项目性能优化，不要仅局限于优化 PHP。</p>
+<p>PHP 性能问题解决方向：</p>
+<ul>
+<li>PHP 语言级的性能优化（语法等基本功能）</li>
+<li>PHP 周边问题的性能优化（周边服务，缓存，数据库等）</li>
+<li>PHP 语言自身分析、优化</li>
+</ul>
+<h2 id="PHP-语言级性能优化"><a href="#PHP-语言级性能优化" class="headerlink" title="PHP 语言级性能优化"></a>PHP 语言级性能优化</h2><h4 id="优化点-1：少写代码，多用-PHP-自身能力"><a href="#优化点-1：少写代码，多用-PHP-自身能力" class="headerlink" title="优化点 1：少写代码，多用 PHP 自身能力"></a>优化点 1：少写代码，多用 PHP 自身能力</h4><p>PHP 代码需要编译为 C 语言再编译为机器语言，这一过程每次请求都会处理一遍，开销较大。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">┌───────┐ Scanner ┌─────────┐</span><br><span class="line">│ *.php ├─────────►  Exprs  │</span><br><span class="line">└───────┘         └────┬────┘ </span><br><span class="line">                       │</span><br><span class="line">                       │ Parser</span><br><span class="line">                       │</span><br><span class="line">┌────────┐  Exec  ┌────▼────┐</span><br><span class="line">│ Output ◄────────┤ Opcodes │</span><br><span class="line">└────────┘        └─────────┘</span><br></pre></td></tr></table></figure>
+<p>自写代码可能有较多冗余。因此，<strong>尽量使用 PHP 自身内置的变量、常量、函数</strong>等。</p>
+<p>值得一提的是，目前很多的 PHP 缓存服务，都是缓存 opcode，从而提高性能。</p>
+<h4 id="优化点-2：PHP-内置函数的性能优劣"><a href="#优化点-2：PHP-内置函数的性能优劣" class="headerlink" title="优化点 2：PHP 内置函数的性能优劣"></a>优化点 2：PHP 内置函数的性能优劣</h4><p>PHP 的内置函数之间，性能依然存在差异。了解 PHP 内置函数的时间复杂度是有必要的。</p>
+<h4 id="优化点-3：少用魔法函数"><a href="#优化点-3：少用魔法函数" class="headerlink" title="优化点 3：少用魔法函数"></a>优化点 3：少用魔法函数</h4><p>PHP 提供的魔法函数性能并不佳，尽可能避免使用。</p>
+<h4 id="优化点-4：错误抑制符"><a href="#优化点-4：错误抑制符" class="headerlink" title="优化点 4：错误抑制符 @"></a>优化点 4：错误抑制符 <code>@</code></h4><p><code>@</code> 符号的逻辑，是在该行代码的执行前后，分别增加 <code>BEGIN_SILENCE</code> 和 <code>END_SILENCE</code> 的 opcode，从而对 Zend 引擎的报错等级做了设置。所以，尽量别用 <code>@</code> 符号。</p>
+<h4 id="优化点-5：合理使用内存"><a href="#优化点-5：合理使用内存" class="headerlink" title="优化点 5：合理使用内存"></a>优化点 5：合理使用内存</h4><p>即使 PHP 有内存回收机制，但也要尽量利用 <code>unset()</code> 及时释放内存。</p>
+<h4 id="优化点-6：正则表达式"><a href="#优化点-6：正则表达式" class="headerlink" title="优化点 6：正则表达式"></a>优化点 6：正则表达式</h4><p>正则表达式的回溯开销较大。有时候，可以考虑使用字符串处理函数来实现。</p>
+<h4 id="优化点-7：避免在循环内做运算"><a href="#优化点-7：避免在循环内做运算" class="headerlink" title="优化点 7：避免在循环内做运算"></a>优化点 7：避免在循环内做运算</h4><p>一个简单的例子就是：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$a</span> = <span class="number">100</span>; <span class="variable">$b</span> = <span class="number">200</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$a</span>+<span class="variable">$b</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="comment">// code here...</span></span><br><span class="line">    &#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<p><code>for</code> 的每次循环，都会重新计算 <code>$a+$b</code>。因此，把运算逻辑，放到循环外部：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$a</span> = <span class="number">100</span>; <span class="variable">$b</span> = <span class="number">200</span>;</span><br><span class="line">    <span class="variable">$c</span> = <span class="variable">$a</span> + <span class="variable">$b</span>;	<span class="comment">// 在循环外部计算</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="variable">$c</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">        <span class="comment">// code here...</span></span><br><span class="line">    &#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="优化点-8：减少计算密集型业务："><a href="#优化点-8：减少计算密集型业务：" class="headerlink" title="优化点 8：减少计算密集型业务："></a>优化点 8：减少计算密集型业务：</h4><p>PHP 不适合做大数据量的运算。PHP 更适合衔接 Web Server 与后端服务，呈现 UI，起到一个纽带的角色。</p>
+<h4 id="优化点-9：使用带引号字符串作为数组键值"><a href="#优化点-9：使用带引号字符串作为数组键值" class="headerlink" title="优化点 9：使用带引号字符串作为数组键值"></a>优化点 9：使用带引号字符串作为数组键值</h4><p>PHP 会将没有带引号的键值作为常量，从而产生寻找常量的开销。这一点，一般情况下会有 notice。因此，严格使用引号，以字符串作为键值。</p>
+<h2 id="PHP-周边问题性能优化"><a href="#PHP-周边问题性能优化" class="headerlink" title="PHP 周边问题性能优化"></a>PHP 周边问题性能优化</h2><p>PHP 周边包括：</p>
+<ul>
+<li>系统环境</li>
+<li>文件存储（硬盘）</li>
+<li>数据库</li>
+<li>缓存（MemCache，Redis 等）</li>
+<li>网络</li>
+</ul>
+<p>优化的过程中，关注主要矛盾，找到问题的核心，才可能有较好的效果。</p>
+<h4 id="优化点-1：减少文件类操作"><a href="#优化点-1：减少文件类操作" class="headerlink" title="优化点 1：减少文件类操作"></a>优化点 1：减少文件类操作</h4><p>常见 PHP 场景的开销次序为：读写网络数据 &gt; 读写磁盘 &gt; 读写数据库 &gt;&gt; 读写内存。</p>
+<p>因此，可以考虑减少网络数据和磁盘数据交互，尽量让 PHP 跟内存打交道。</p>
+<h4 id="优化点-2：优化网络请求"><a href="#优化点-2：优化网络请求" class="headerlink" title="优化点 2：优化网络请求"></a>优化点 2：优化网络请求</h4><p>网络请求涉及 API 稳定性和网络稳定性等因素。因此可以：</p>
+<ol>
+<li><p>设置超时时间<br>a. 连接超时（约 200ms）<br>b. 读超时（小于 1s）<br>c. 写超时（约 500ms）</p>
+</li>
+<li><p>将串行请求并行化<br>a. 使用 <code>curl_multi_*()</code><br>b.使用 <code>swoole</code> 扩展</p>
+</li>
+<li><p>压缩 PHP 的 API 输出</p>
+<p>当接口数据大于 100k 的时候，可以考虑使用 <code>Gzip</code> 压缩 API 输出，让客户端能更快地获取数据。</p>
+<p>代价是服务端和客户端都会产生额外的 CPU 开销。</p>
+</li>
+</ol>
+<h4 id="优化点-3：缓存重复计算内容"><a href="#优化点-3：缓存重复计算内容" class="headerlink" title="优化点 3：缓存重复计算内容"></a>优化点 3：缓存重复计算内容</h4><p>对多次请求但内容相同的重复计算场景，设置缓存。例如，项目的模板渲染等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">      OUTPUT</span><br><span class="line">        ▲</span><br><span class="line">    ┌───┴───┐</span><br><span class="line">    │ *.php ◄──┐</span><br><span class="line">    └───▲───┘  │</span><br><span class="line">        │      │Cached</span><br><span class="line">    ┌───▼───┐  │</span><br><span class="line">┌───► Cache ├──┘</span><br><span class="line">│   └───┬───┘</span><br><span class="line">│       │No Cache</span><br><span class="line">│ ┌─────▼──────┐</span><br><span class="line">└─┤Process Data│</span><br><span class="line">  └────────────┘</span><br></pre></td></tr></table></figure>
+<h4 id="优化点-4：重叠时间窗口思想"><a href="#优化点-4：重叠时间窗口思想" class="headerlink" title="优化点 4：重叠时间窗口思想"></a>优化点 4：重叠时间窗口思想</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">串行：</span><br><span class="line">┌─────────┐┌─────────┐┌─────────┐┌─────────┐</span><br><span class="line">│Process 1││Process 2││Process 3││Process 4│</span><br><span class="line">└─────────┘└─────────┘└─────────┘└─────────┘</span><br><span class="line">重叠时间窗口：</span><br><span class="line">┌─────────┐</span><br><span class="line">│Process 1│</span><br><span class="line">└─────────┘</span><br><span class="line">	┌─────────┐</span><br><span class="line">	│Process 2│</span><br><span class="line">	└─────────┘</span><br><span class="line">		┌─────────┐</span><br><span class="line">		│Process 3│</span><br><span class="line">		└─────────┘</span><br><span class="line">			┌─────────┐</span><br><span class="line">			│Process 4│</span><br><span class="line">			└─────────┘</span><br></pre></td></tr></table></figure>
+<p>如果后续的任务不强依赖前面的任务，那么可以考虑重叠时间窗口。</p>
+<h4 id="优化点-5：旁路方案"><a href="#优化点-5：旁路方案" class="headerlink" title="优化点 5：旁路方案"></a>优化点 5：旁路方案</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">┌─────────┐</span><br><span class="line">│  *.php  │</span><br><span class="line">└────┬────┘</span><br><span class="line">     │</span><br><span class="line">┌────▼────┐</span><br><span class="line">│Process 1│</span><br><span class="line">└────┬────┘   ┌─────────┐</span><br><span class="line">     │────────►Process 2│</span><br><span class="line">┌────▼────┐   └────┬────┘</span><br><span class="line">│Process 3│        │</span><br><span class="line">└────┬────┘        │</span><br><span class="line">     │◄────────────┘</span><br><span class="line">┌────▼────┐</span><br><span class="line">│Process 4│</span><br><span class="line">└────┬────┘</span><br><span class="line">     │</span><br><span class="line">     ▼</span><br></pre></td></tr></table></figure>
+<p>旁路方案的实现，也要求后续的任务不强依赖前面的任务。</p>
+<h2 id="相关工具"><a href="#相关工具" class="headerlink" title="相关工具"></a>相关工具</h2><h3 id="压力测试：Apache-Benchmark"><a href="#压力测试：Apache-Benchmark" class="headerlink" title="压力测试：Apache Benchmark"></a>压力测试：Apache Benchmark</h3><p>Apache Benchmark<a href="#ref_1"><sup>1</sup></a> 是在安装 Apache 服务器时自带的软件。</p>
+<p>基本用法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./ab -n 100 -c 100 https://www.fyeve.vip/</span><br><span class="line"><span class="comment"># -n 请求数 -c 并发数 url目标压测地址</span></span><br></pre></td></tr></table></figure>
+<p>返回结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken for tests:   0.283 seconds</span><br><span class="line">Complete requests:      100</span><br><span class="line">Failed requests:        0</span><br><span class="line">Write errors:           0</span><br><span class="line">Total transferred:      1933500 bytes</span><br><span class="line">HTML transferred:       1909900 bytes</span><br><span class="line">Requests per second:    353.92 [#&#x2F;sec] (mean)</span><br><span class="line">Time per request:       282.553 [ms] (mean)</span><br><span class="line">Time per request:       2.826 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          6682.58 [Kbytes&#x2F;sec] received</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>其中，<code>Requests per second</code> 要优化得尽可能多，而 <code>Time per request</code> 要优化得尽可能少。这也是在使用 Apache Benchmark 时主要关注的两个点。</p>
+<h3 id="性能分析：tideways-xhprof-扩展"><a href="#性能分析：tideways-xhprof-扩展" class="headerlink" title="性能分析：tideways_xhprof 扩展"></a>性能分析：<code>tideways_xhprof</code> 扩展</h3><p><code>tideways_xhprof</code><a href="#ref_2"><sup>2</sup></a> 是一个 PHP 分层性能分析工具。具体可参考其 <a target="_blank" rel="noopener" href="https://github.com/tideways/php-xhprof-extension">GitHub 项目页面</a>。</p>
+<h3 id="opcode-代码分析：vld-扩展"><a href="#opcode-代码分析：vld-扩展" class="headerlink" title="opcode 代码分析：vld 扩展"></a>opcode 代码分析：<code>vld</code> 扩展</h3><p><code>vld</code>（Vulcan Logic Dumper）<a href="#ref_3"><sup>3</sup></a>扩展能挂钩 Zend 引擎，输出 PHP 执行的 opcodes。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://httpd.apache.org/docs/2.4/programs/ab.html">The Apache Software Foundation, ab - Apache HTTP server benchmarking tool</a></p>
+<p><a name="ref_2">[2] <a target="_blank" rel="noopener" href="https://github.com/tideways/php-xhprof-extension">Tideways, Tideways XHProf Extension</a></p>
+<p><a name="ref_3">[3] <a target="_blank" rel="noopener" href="https://derickrethans.nl/projects.html#vld">Derick Rethans, projects - Vulcan Logic Dumper</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/06/04/CSSfloat/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -189,7 +331,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-05 07:27:13" itemprop="dateModified" datetime="2021-06-05T07:27:13+08:00">2021-06-05</time>
+                <time title="修改时间：2021-06-06 08:09:42" itemprop="dateModified" datetime="2021-06-06T08:09:42+08:00">2021-06-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -271,7 +413,7 @@
 <p>效果如下：</p>
 <img src="/images/Clear.png" alt="Clear" style="zoom:50%;" />
 
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context">MDN contributors, Block formatting context</a></a><br>[2] <a target="_blank" rel="noopener" href="https://www.imooc.com/">慕课网</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context">MDN contributors, Block formatting context</a></a></p>
 
       
     </div>
@@ -1203,95 +1345,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2019/07/06/pip-ImportError/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Alan Tanis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="K162">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/07/06/pip-ImportError/" class="post-title-link" itemprop="url">ImportError: cannot import name 'main' from 'pip'</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2019-07-06 22:04:39 / 修改时间：22:59:08" itemprop="dateCreated datePublished" datetime="2019-07-06T22:04:39+08:00">2019-07-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2019/07/06/pip-ImportError/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2019/07/06/pip-ImportError/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在使用 <code>pip3 install --upgrade pip</code> 升级 pip3 之后，运行 pip3 发生如下报错：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@raspberrypi:~ $ pip3</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">&quot;/usr/bin/pip3&quot;</span>, line 9, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    from pip import main</span><br><span class="line">ImportError: cannot import name <span class="string">&#x27;main&#x27;</span> from <span class="string">&#x27;pip&#x27;</span> (/home/pi/.<span class="built_in">local</span>/lib/python3.7/site-packages/pip/__init__.py)</span><br></pre></td></tr></table></figure>
-<p>报错的原因是 pip 升级后，<code>main</code> 函数发生了修改。因此根据报错提示，修改 <code>/usr/bin/pip3</code> 这个文件：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pip <span class="keyword">import</span> main    <span class="comment"># 这是原先的语句</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    sys.exit(main())</span><br></pre></td></tr></table></figure>
-<p>修改为：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pip._internal <span class="keyword">import</span> main  <span class="comment"># 修改后的语句</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    sys.exit(main())</span><br></pre></td></tr></table></figure>
-<p>如果在用 vim 修改文件的过程中，提示 readonly，可尝试使用 sudo 权限进行修改。</p>
-<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/28210269">Stack Overflow. ImportError: cannot import name main when running pip –version command in windows7 32 bit</a></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1363,7 +1416,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">20</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1376,7 +1429,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
