@@ -158,6 +158,101 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/01/16/networksetup-on-mac/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/01/16/networksetup-on-mac/" class="post-title-link" itemprop="url">Mac 使用 networksetup 快速切换代理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-16 10:08:08 / 修改时间：10:58:13" itemprop="dateCreated datePublished" datetime="2023-01-16T10:08:08+08:00">2023-01-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E7%A0%81/" itemprop="url" rel="index"><span itemprop="name">数码</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2023/01/16/networksetup-on-mac/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2023/01/16/networksetup-on-mac/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>我习惯在 Terminal 中直接使用某软件的 core，接着手动在 <code>系统偏好设置-&gt;网络-&gt;高级-&gt;代理</code> 打开/关闭代理配置。但苦于要一次次在系统偏好设置中来回切换设置，实在觉得麻烦。</p>
+<p>最近发现，Apple 在 Remote Desktop 支持上，提供了一个命令 <code>networksetup</code>，用来快速配置客户端的网络设置。<a href="#ref_1"><sup>1</sup></a></p>
+<p>例如，可以使用它快速获取当前硬件端口上所有的网络服务：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> networksetup -listallnetworkservices</span></span><br><span class="line">USB 10/100/1000 LAN</span><br><span class="line">Wi-Fi</span><br><span class="line">Thunderbolt Bridge</span><br></pre></td></tr></table></figure>
+<p>或是借助下面的命令，快速配置设备的网络代理。更多用法可以通过 <code>networksetup -help</code> 查看。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Web Proxy (HTTP)</span></span><br><span class="line">networksetup -getwebproxy &lt;networkservice&gt;</span><br><span class="line">networksetup -setwebproxy &lt;networkservice&gt; &lt;domain&gt; &lt;port number&gt; &lt;authenticated&gt; &lt;username&gt; &lt;password&gt;</span><br><span class="line">networksetup -setwebproxystate &lt;networkservice&gt; &lt;on off&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Secure Web Proxy (HTTPS)</span></span><br><span class="line">networksetup -getsecurewebproxy &lt;networkservice&gt;</span><br><span class="line">networksetup -setsecurewebproxy &lt;networkservice&gt; &lt;domain&gt; &lt;port number&gt; &lt;authenticated&gt; &lt;username&gt; &lt;password&gt;</span><br><span class="line">networksetup -setsecurewebproxystate &lt;networkservice&gt; &lt;on off&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># SOCKS Proxy</span></span><br><span class="line">networksetup -getsocksfirewallproxy &lt;networkservice&gt;</span><br><span class="line">networksetup -setsocksfirewallproxy &lt;networkservice&gt; &lt;domain&gt; &lt;port number&gt; &lt;authenticated&gt; &lt;username&gt; &lt;password&gt;</span><br><span class="line">networksetup -setsocksfirewallproxystate &lt;networkservice&gt; &lt;on off&gt;</span><br></pre></td></tr></table></figure>
+<p>开心！那我岂不是可以在 <code>捷径（Shortcuts）</code> 中创建一个 shortcut，然后丢 menu bar，就能一键切换代理啦！</p>
+<img src="..\images\shortcut detail.png" alt="shortcut detail" style="zoom:50%;" />
+
+<img src="..\images\shortcut menu bar.png" alt="shortcut on menu bar" style="zoom:50%;" />
+
+<p>本来还尝试过，想让 Shortcut 打开 Terminal 直接执行命令，或通过捷径用 Terminal 去打开一个 <code>.command</code> 文件，但可惜，都不允许呢~可不管怎样，有这个命令后，真的比以前方便很多了！</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://support.apple.com/guide/remote-desktop/about-networksetup-apdd0c5a2d5/mac">About networksetup in Remote Desktop
+</a></a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/02/reading-traveling-and-love/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1181,129 +1276,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/02/phpmyad-1698/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Alan Tanis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="K162">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/02/phpmyad-1698/" class="post-title-link" itemprop="url">phpMyAdmin 报 1698 错误</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-02 18:22:03" itemprop="dateCreated datePublished" datetime="2019-10-02T18:22:03+08:00">2019-10-02</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-29 18:43:47" itemprop="dateModified" datetime="2020-01-29T18:43:47+08:00">2020-01-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2019/10/02/phpmyad-1698/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2019/10/02/phpmyad-1698/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="0x00-问题起因"><a href="#0x00-问题起因" class="headerlink" title="0x00 问题起因"></a>0x00 问题起因</h2><p>为了方便操作数据库，我部署了 phpMyAdmin。但在使用 root 用户登录的时候，却提示：</p>
-<blockquote>
-<p>mysqli_real_connect(): (hy000/1698): access denied for user ‘root’@’localhost’</p>
-</blockquote>
-<h2 id="0x01-解决方案"><a href="#0x01-解决方案" class="headerlink" title="0x01 解决方案"></a>0x01 解决方案</h2><p>在检索了相关文章和资料后，了解到 MySQL 5.7+ 的版本，由于在安全机制上有一定的改动，因此默认情况下，命令行需要使用 <code>sudo</code> 来登录 root 用户。</p>
-<p>StackExchange 上，用户 Rael Gugelmin Cunha 提供了一种解决方案，思路是：创建一个赋予了足够权限的新用户。<a href="#ref_1"><sup>1</sup></a></p>
-<p>具体步骤如下：</p>
-<p>1、创建用户，并使用密码认证：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="string">&#x27;new_user&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;your_password&#x27;</span>;</span><br></pre></td></tr></table></figure>
-<p>2、赋予权限</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">TO</span> <span class="string">&#x27;new_user&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> <span class="keyword">WITH</span> <span class="keyword">GRANT</span> OPTION;</span><br></pre></td></tr></table></figure>
-<p>但是我觉得 <code>WITH GRANT OPTION</code> 可有可无。</p>
-<p>3、刷新权限</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLUSH PRIVILEGES;</span><br></pre></td></tr></table></figure>
-<h2 id="0x02-新的问题"><a href="#0x02-新的问题" class="headerlink" title="0x02 新的问题"></a>0x02 新的问题</h2><p>创建用户后，我成功地使用新用户，通过 phpMyAdmin 登录了数据库。然而，同时我却发现，root 用户也能登录了。</p>
-<p><strong>为什么创建了新用户后，root 用户也能登录了？</strong></p>
-<h2 id="0x03-MySQL-安全组件和插件"><a href="#0x03-MySQL-安全组件和插件" class="headerlink" title="0x03 MySQL 安全组件和插件"></a>0x03 MySQL 安全组件和插件</h2><p>我开始摸索，MySQL 5.7+ 版本的 root 用户的安全机制上，到底在哪里出现了变动。</p>
-<h4 id="1-Socket-Peer-Credential-Authentication"><a href="#1-Socket-Peer-Credential-Authentication" class="headerlink" title="1. Socket Peer-Credential Authentication"></a>1. Socket Peer-Credential Authentication</h4><p>同样是在 StackExchange 上，用户 Todor 提到：</p>
-<blockquote>
-<p>If you install 5.7 and don’t provide a password to the <code>root</code> user, it will use the <code>auth_socket</code> plugin. That plugin doesn’t care and doesn’t need a password. It just checks if the user is connecting using a UNIX socket and then compares the username.<a href="#ref_2"><sup>2</sup></a></p>
-</blockquote>
-<p>在没有给 root 用户设置新密码前，root 用户默认使用 <code>auth_socket</code> 安全插件<a href="#ref_3"><sup>3</sup></a>。<code>auth_socket</code> 通过检查当前用户是否使用 UNIX socket 并比较用户名来进行认证。</p>
-<p>在 <code>user</code> 表中，就记录有相关的信息：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; select user,host,plugin from mysql.user;</span><br><span class="line">+------+-----------+-------------+</span><br><span class="line">| user | host      | plugin      |</span><br><span class="line">+------+-----------+-------------+</span><br><span class="line">| root | localhost | unix_socket |</span><br><span class="line">+------+-----------+-------------+</span><br></pre></td></tr></table></figure>
-<p>换言之，对于我当前的 root 用户登录数据库，如果使用 <code>unix_socket</code> 安全插件，那就只需要：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mysql</span><br></pre></td></tr></table></figure>
-<h4 id="2-Native-Authentication"><a href="#2-Native-Authentication" class="headerlink" title="2. Native Authentication"></a>2. Native Authentication</h4><p>在此之前，我都是使用 <code>mysql_native_password</code> 这种较为传统的方式。</p>
-<p>而且平时，我习惯在 MySQL 环境中使用 <code>SET PASSWORD</code> 命令修改密码：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> PASSWORD <span class="keyword">for</span> root<span class="variable">@localhost</span> <span class="operator">=</span> password(<span class="string">&#x27;new_password&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<p>在执行完命令后，用户相应的 <code>plugin</code> 就会变成 <code>mysql_native_password</code>，并在 <code>FLUSH PRIVILEGES</code> 后生效。</p>
-<h2 id="0x04-为什么之前没有发现"><a href="#0x04-为什么之前没有发现" class="headerlink" title="0x04 为什么之前没有发现"></a>0x04 为什么之前没有发现</h2><p>想来想去，应该就是自己当时在**修改了 root 密码之后，没有及时 <code>FLUSH PRIVILEGES</code>**，且平时一直在用 <code>sudo mysql -u root -p</code> 登录数据库，所以没有意识到这些问题。</p>
-<h2 id="0x05-另外的解决方案"><a href="#0x05-另外的解决方案" class="headerlink" title="0x05 另外的解决方案"></a>0x05 另外的解决方案</h2><p>所以，除了创建新用户之外，把用户的安全认证方式从 <code>UNIX_socket</code> 修改成 <code>mysql_native_password</code> 也是一种办法。</p>
-<p>因此可以通过一行命令来实现：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span> <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="keyword">BY</span> <span class="string">&#x27;your_password&#x27;</span>;</span><br></pre></td></tr></table></figure>
-<p>当然，这种情况下，也可以设置一个空密码。如果修改 root 用户时，提示权限不足，可检查下是否是 <code>sudo mysql</code> 登录的。</p>
-<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://askubuntu.com/questions/763336/cannot-enter-phpmyadmin-as-root-mysql-5-7">askubuntu, Cannot enter phpmyadmin as root (MySQL 5.7)</a></a><br><a name="ref_2">[2] <a target="_blank" rel="noopener" href="https://askubuntu.com/questions/766334/cant-login-as-mysql-user-root-from-normal-user-account-in-ubuntu-16-04#">askubuntu, can’t login as mysql user root from normal user account in ubuntu 16.04</a></a><br><a name="ref_3">[3] <a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/socket-pluggable-authentication.html">Oracle, MySQL 8.0 Reference Manual</a></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1375,7 +1347,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1429,7 +1401,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
