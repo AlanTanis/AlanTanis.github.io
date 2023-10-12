@@ -158,6 +158,100 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/12/31/autoload-classmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/12/31/autoload-classmap/" class="post-title-link" itemprop="url">Laravel Seeder 报错：Target class [BarTableSeeder does not exist]</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-12-31 10:36:09 / 修改时间：11:08:04" itemprop="dateCreated datePublished" datetime="2019-12-31T10:36:09+08:00">2019-12-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/12/31/autoload-classmap/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/31/autoload-classmap/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在使用 Laravel Artisan 生成 Seeder 的过程中，<strong>不小心输错了 Seeder 名</strong>，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php artisan make:seeder FooTableSeeder</span><br></pre></td></tr></table></figure>
+<p>以至于填充数据时发生报错：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php artisan db:seed --class&#x3D;BarTableSeeder</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Illuminat\Contracts\Container\BindingResolutionException : Target class [BarTableSeeder] does not exist.</p>
+</blockquote>
+<p>此时，如果单单修改生成的 Seeder 文件名 <code>FooTableSeeder.php</code> 为 <code>BarTableSeeder</code>，依然报错。</p>
+<p>这是因为 <strong>Composer 的 autoloader 中仍存有错误的 classmap 记录</strong>，例如在 <code>vendor/compser/autoload_classmap.php</code> 中，我们可以看到原先错误的 classmap 记录：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;FooTableSeeder&#x27;</span> =&gt; <span class="variable">$baseDir</span> . <span class="string">&#x27;/database/seeds/FooTableSeeder.php&#x27;</span>,</span><br></pre></td></tr></table></figure>
+<p>使用 <code>dump-autoload</code> 重新生成 Composer 的 autoloader：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer dump-autoload</span><br></pre></td></tr></table></figure>
+<p>之后就可以顺利地进行数据填充了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/02/phpmyad-1698/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1306,114 +1400,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/09/exFAT-on-Mac/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Alan Tanis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="K162">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/03/09/exFAT-on-Mac/" class="post-title-link" itemprop="url">macOS 环境下 exFAT 格式磁盘无法正常挂载的问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-03-09 19:22:55" itemprop="dateCreated datePublished" datetime="2018-03-09T19:22:55+08:00">2018-03-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2018-03-30 21:24:37" itemprop="dateModified" datetime="2018-03-30T21:24:37+08:00">2018-03-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E7%A0%81/" itemprop="url" rel="index"><span itemprop="name">数码</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2018/03/09/exFAT-on-Mac/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2018/03/09/exFAT-on-Mac/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h3><p>主管交给我一块移动硬盘，她说她需要这块移动硬盘在 macOS 和 Windows 之间拷贝数据。我在 Windows 下用资源管理器右键菜单的格式化选项，格式化了硬盘。</p>
-<p>这块硬盘硬盘能顺利地在 Windows 中进行文件读写。但是，在 Mac 环境中，却无法正常挂载。现象是将移动硬盘与 Mac 连接后，Finder 及桌面无法显示移动磁盘的图标。在 Disk Utility 中也无法顺利检查到该移动硬盘。</p>
-<p>但如果打开 Terminal，使用 <code>diskutil list</code> 能顺利看到 disk identifier 和 disk name。但是磁盘分区 TYPE 却显示为 Windows_NTFS。这个就很奇怪了。</p>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>经过求助搜索引擎，以及参考了 Apple Community 上的一篇帖子<a href="#ref_1"><sup>1</sup></a>，一位叫 <a target="_blank" rel="noopener" href="https://discussions.apple.com/people/aixxo">aixxo</a> 的用户也遇到了和我相同的问题：</p>
-<blockquote>
-<p>Hi, I’m trying to mount an exFAT harddrive via usb. The disk is recognized and show in the disk utility, but i cannot activate it. The only error I get is in the Console :</p>
-<p>28.02.11 20:38:36 kernel exfat: bytes per cluster (4194304) &gt; MAXBSIZE (1048576). Can’t mount.</p>
-<p>Any chance of getting access to the drive? It mounts perfectly under Windows 7.</p>
-</blockquote>
-<p>但他后来似乎通过自己找到了所需要的答案：</p>
-<blockquote>
-<p>Ok,I resolved the issue.<br> hen formatting a exFAT drive under Windows you can choose the cluster size. If the drive should be used with OSX you should not choose anything higher than 1024!</p>
-</blockquote>
-<p>但也有人在后面的讨论中提到更大簇尺寸的情况，例如 <a target="_blank" rel="noopener" href="https://discussions.apple.com/people/lmcurley">Imcurley</a>：</p>
-<blockquote>
-<p>Perfect thanks. I got it working too with 1024, had issues with 4096 cluster size.</p>
-</blockquote>
-<p>但大多数的声音都是将 cluster size 设置到 1024 就能解决问题！经过尝试，我面临的问题，依靠设置这个也成功解决。</p>
-<p>总的而言，就是在 Windows 下利用资源管理器格式化磁盘前，需要将 <strong>cluster size 即 分配单元大小 设置为 1024 字节</strong>，就能让 exFAT 格式的移动硬盘在 Windows 和 Mac 之间兼容使用。</p>
-<p>不过说起来，当时自己怎么就没想到去检查下 console 呢……下次遇到什么问题时，或许可以留意下。</p>
-<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://discussions.apple.com/thread/2767345">aixxo, exFAT mounting problem</a></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1485,20 +1471,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

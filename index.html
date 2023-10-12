@@ -158,6 +158,96 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/12/freepbx_installation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/12/freepbx_installation/" class="post-title-link" itemprop="url">installation</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-12 09:01:23 / 修改时间：19:43:39" itemprop="dateCreated datePublished" datetime="2023-10-12T09:01:23+08:00">2023-10-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Make-IT-Happen/" itemprop="url" rel="index"><span itemprop="name">Make IT Happen</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2023/10/12/freepbx_installation/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2023/10/12/freepbx_installation/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>When I install FreePBX in Vmare Workstation Player with the ISO image <code>STABLE SNG7-PBX-64bit-2203-2</code> downloaded from <a target="_blank" rel="noopener" href="https://www.freepbx.org/downloads">FreePBX Official website</a>, it raised an error message like screenshot below.</p>
+<img src="..\images\Kernel-devel.png" alt="shortcut detail" style="zoom:50%;" />
+>You have specified that the package 'kernel-devel' should be installed. This package does not exist. Wouly you like to ignore this package and continue with installation?
+
+<p>Regardless of whether Yes or No is clicked, the installer will be terminated, entering a black screen with a blinking cursor.</p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>FreePBX ISO should not be setup with <strong>Easy Install</strong> in Vmware Workstation Player. So please select the option <strong>I will install the operating system later</strong> in the wizard.</p>
+<img src="..\images\NotEasyInstall.png" alt="shortcut detail" style="zoom:50%;" />
+
+<p>Vmware will detect CentOS 7 in the image. After that, you should be able to install FreePBX properly.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/01/16/networksetup-on-mac/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1182,100 +1272,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2019/12/31/autoload-classmap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Alan Tanis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="K162">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/12/31/autoload-classmap/" class="post-title-link" itemprop="url">Laravel Seeder 报错：Target class [BarTableSeeder does not exist]</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2019-12-31 10:36:09 / 修改时间：11:08:04" itemprop="dateCreated datePublished" datetime="2019-12-31T10:36:09+08:00">2019-12-31</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2019/12/31/autoload-classmap/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/31/autoload-classmap/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在使用 Laravel Artisan 生成 Seeder 的过程中，<strong>不小心输错了 Seeder 名</strong>，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php artisan make:seeder FooTableSeeder</span><br></pre></td></tr></table></figure>
-<p>以至于填充数据时发生报错：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php artisan db:seed --class&#x3D;BarTableSeeder</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Illuminat\Contracts\Container\BindingResolutionException : Target class [BarTableSeeder] does not exist.</p>
-</blockquote>
-<p>此时，如果单单修改生成的 Seeder 文件名 <code>FooTableSeeder.php</code> 为 <code>BarTableSeeder</code>，依然报错。</p>
-<p>这是因为 <strong>Composer 的 autoloader 中仍存有错误的 classmap 记录</strong>，例如在 <code>vendor/compser/autoload_classmap.php</code> 中，我们可以看到原先错误的 classmap 记录：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;FooTableSeeder&#x27;</span> =&gt; <span class="variable">$baseDir</span> . <span class="string">&#x27;/database/seeds/FooTableSeeder.php&#x27;</span>,</span><br></pre></td></tr></table></figure>
-<p>使用 <code>dump-autoload</code> 重新生成 Composer 的 autoloader：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer dump-autoload</span><br></pre></td></tr></table></figure>
-<p>之后就可以顺利地进行数据填充了。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1347,20 +1343,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
