@@ -158,6 +158,108 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/04/07/webdav/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/04/07/webdav/" class="post-title-link" itemprop="url">Configure WebDAV with Apache2 on Raspberry Pi</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-04-07 11:42:52 / 修改时间：12:45:12" itemprop="dateCreated datePublished" datetime="2024-04-07T11:42:52+08:00">2024-04-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Make-IT-Happen/" itemprop="url" rel="index"><span itemprop="name">Make IT Happen</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2024/04/07/webdav/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2024/04/07/webdav/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Recently, I try to manage the documents, papers and references with Zotero. To enable the synchronization between my devices and multi platforms, I decide to set up my Raspberry Pi as an WebDAV server to keep my libraries updated.</p>
+<p>If you are in a environment such as Ubuntu, the steps for configuration are similar.</p>
+<h3 id="Step-1-Install-Apache2-and-enable-WebDAV-module"><a href="#Step-1-Install-Apache2-and-enable-WebDAV-module" class="headerlink" title="Step 1: Install Apache2 and enable WebDAV module"></a>Step 1: Install Apache2 and enable WebDAV module</h3><p>Firstly, we need to install Apache Web server to enable WebDAV file sharing:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install apache2</span><br></pre></td></tr></table></figure>
+<p>And enable WebDAV module with the directive following:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo a2enmod dav</span><br><span class="line">sudo a2enmod dav_fs</span><br></pre></td></tr></table></figure>
+<h3 id="Step-2-Create-the-directory-for-WebDAV"><a href="#Step-2-Create-the-directory-for-WebDAV" class="headerlink" title="Step 2: Create the directory for WebDAV"></a>Step 2: Create the directory for WebDAV</h3><p>We will organize the documents files within the folder we created:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /var/www/webdav</span><br></pre></td></tr></table></figure>
+<p>Remember to set the owner and group of the directory to apache’s user and group, granting permission  to <code>www-data</code>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chown www-data:www-data /var/www/webdav</span><br></pre></td></tr></table></figure>
+<h3 id="Step-3-Configure-Apache-Host"><a href="#Step-3-Configure-Apache-Host" class="headerlink" title="Step 3: Configure Apache Host"></a>Step 3: Configure Apache Host</h3><p>Add the following directives inside the <code>&lt;VirtualHost&gt;</code> tags in the file <code>/etc/apache2/sites-available/000-default.conf</code>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Alias /webdav /var/www/webdav</span><br><span class="line">&lt;Location /webdav&gt;</span><br><span class="line">    DAV On</span><br><span class="line">    AuthType Basic</span><br><span class="line">    AuthName &quot;WebDAV&quot;</span><br><span class="line">    AuthUserFile /etc/apache2/webdav.users</span><br><span class="line">    Require valid-user</span><br><span class="line">&lt;/Location&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="Step-4-Create-user-for-WebDAV"><a href="#Step-4-Create-user-for-WebDAV" class="headerlink" title="Step 4: Create user for WebDAV"></a>Step 4: Create user for WebDAV</h3><p>Use the <code>htpasswd</code> utilitiy to create a user for WebDAV accessing:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo htpasswd -c /etc/apache2/webdav.users your_username</span><br></pre></td></tr></table></figure>
+<h3 id="Step-5-Restart-Apache"><a href="#Step-5-Restart-Apache" class="headerlink" title="Step 5: Restart Apache"></a>Step 5: Restart Apache</h3><p>Restart <code>apache2</code> to apply the change:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart apache2</span><br></pre></td></tr></table></figure>
+<p>If you encounter some error message like below when restarting <code>apache.service</code>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Address already in use: AH00072: make_sock: could not bind to address...</span><br></pre></td></tr></table></figure>
+<p>Please check the processes or services listening on the port that Apache is configured to use.</p>
+<p>We can open Web browser and type <code>http:/serveer_ip/webdav</code> to check the connection and WebDAV availability. Enter the user and password in the pop-up window, then you will access the directory we created.</p>
+<p>Finally, Zotero could synchronize the documents with the local server at a fast speed. (树莓派吃灰属性 -1 😆)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/12/freepbx_installation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1108,178 +1210,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/01/29/tf-keras-basic/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Alan Tanis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="K162">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/01/29/tf-keras-basic/" class="post-title-link" itemprop="url">基于 tf.keras 搭建简单神经网络</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-01-29 13:41:07" itemprop="dateCreated datePublished" datetime="2020-01-29T13:41:07+08:00">2020-01-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-30 22:09:55" itemprop="dateModified" datetime="2020-01-30T22:09:55+08:00">2020-01-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/01/29/tf-keras-basic/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/01/29/tf-keras-basic/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Tensorflow 从 2.0 版本开始，Keras 就被深度集成在了其中<a href="#ref_1"><sup>1</sup></a>。同时，Tensorflow 2.0 相较于 1.x 版本，在很多方面都做出了改变。这里我尝试使用 <code>tf.keras</code> 针对 Regression 和 Classification 搭建简单的神经网络，记录一下过程，并进行简单的梳理。</p>
-<h2 id="Import"><a href="#Import" class="headerlink" title="Import"></a>Import</h2><p>复制粘贴，一次引入，快捷高效，简单粗暴：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> tensorflow <span class="keyword">import</span> keras</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> matplotlib <span class="keyword">as</span> mpl</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为了能在 Jupyter Notebook 中显示图片</span></span><br><span class="line">%matplotlib inline</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> sklearn</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印各个版本信息</span></span><br><span class="line">print(sys.version_info)</span><br><span class="line"><span class="keyword">for</span> module <span class="keyword">in</span> tf, keras, mpl, np, pd, sklearn:</span><br><span class="line">    print(module.__name__, module.__version__)</span><br></pre></td></tr></table></figure>
-<p>在这，也记录一下我当前的版本信息：</p>
-<div class="note info">
-            <pre style="background: #fff; color: #555">sys.version_info(major=3, minor=7, micro=6, releaselevel='final', serial=0)tensorflow 2.0.0tensorflow_core.keras 2.2.4-tfmatplotlib 3.1.1numpy 1.18.1pandas 0.25.3sklearn 0.22.1</pre>
-          </div>
-
-<h2 id="Regression"><a href="#Regression" class="headerlink" title="Regression"></a>Regression</h2><h3 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h3><p>回归问题的数据集，使用的是 sklearn 中的“加州房价”：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> fetch_california_housing</span><br><span class="line"></span><br><span class="line">housing = fetch_california_housing()</span><br></pre></td></tr></table></figure>
-<h3 id="Data-Split"><a href="#Data-Split" class="headerlink" title="Data Split"></a>Data Split</h3><p>按默认 3:1 的比例拆分数据（即 <code>test_size=0.25</code>），选取出训练集、验证集、测试集。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"></span><br><span class="line">x_train_all, x_test, y_train_all, y_test = train_test_split(</span><br><span class="line">    housing.data, housing.target, random_state = <span class="number">7</span>)</span><br><span class="line">x_train, x_valid, y_train, y_valid = train_test_split(</span><br><span class="line">    x_train_all, y_train_all, random_state = <span class="number">11</span>)</span><br><span class="line"></span><br><span class="line">print(x_train.shape, y_train.shape) <span class="comment"># (11610, 8) (11610,)</span></span><br><span class="line">print(x_valid.shape, y_valid.shape) <span class="comment"># (3870, 8) (3870,)</span></span><br><span class="line">print(x_test.shape, y_test.shape) <span class="comment"># (5160, 8) (5160,)</span></span><br></pre></td></tr></table></figure>
-<h3 id="Normalization"><a href="#Normalization" class="headerlink" title="Normalization"></a>Normalization</h3><p>一言不合正则化：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line"></span><br><span class="line">scaler = StandardScaler()</span><br><span class="line">x_train_scaled = scaler.fit_transform(x_train)</span><br><span class="line">x_valid_scaled = scaler.transform(x_valid)</span><br><span class="line">x_test_scaled = scaler.transform(x_test)</span><br></pre></td></tr></table></figure>
-<p>这里我想简单说一说 <code>fit_transform()</code> 和 <code>transform()</code> 的区别，因为这个细节我之前也琢磨了一段时间，这里，还得提到另外一个函数，就是 <code>fit()</code>。官方的 API 文档中<a href="#ref_2"><sup>2</sup></a>，对这三个函数是这样解释的：</p>
-<div class="note warning">
-            <p><code>fit(self, X[, y])</code><br>Compute the mean and std to be used for later scaling.</p><p><code>transform(self, X[, copy])</code><br>Perform standardization by centering and scaling.</p><p><code>fit_transform(self, X[, y])</code><br>Fit to data, then transform it.</p>
-          </div>
-
-<p>简单而言，<code>fit_transform()</code> 就是整合了 <code>fit()</code> 和 <code>transform()</code> 的功能。当我在训练集上用 <code>fit_transform()</code> 做 scale 的时候，它会先计算均值和方差，并记录下来，这就是 <code>fit()</code> 的功能。然后，再对数据执行归一化，也就是 <code>transform()</code>。</p>
-<p>而验证集和测试集，都是用的训练集的均值和方差。也就是说，在训练集有过一次拟合后，验证集和测试集就可以直接根据训练集的均值和方差，调用 <code>transform()</code> 执行归一化。</p>
-<h3 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h3><p>在网络搭建的过程中，相比 1.0 版本，Tensorflow 2.0 的确是引起舒♂适！</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 搭建网络</span></span><br><span class="line">model = keras.models.Sequential([</span><br><span class="line">    keras.layers.Dense(<span class="number">30</span>, activation=<span class="string">&#x27;relu&#x27;</span>, input_shape=x_train.shape[<span class="number">1</span>:]),</span><br><span class="line">    keras.layers.Dense(<span class="number">1</span>),</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译模型</span></span><br><span class="line">model.<span class="built_in">compile</span>(loss=<span class="string">&quot;mean_squared_error&quot;</span>, </span><br><span class="line">    optimizer = keras.optimizers.SGD(<span class="number">0.001</span>))</span><br><span class="line">    </span><br><span class="line">callbacks = [keras.callbacks.EarlyStopping(</span><br><span class="line">    patience=<span class="number">5</span>, min_delta=<span class="number">1e-2</span>)]</span><br></pre></td></tr></table></figure>
-<p>通过 <code>model.summary()</code> 可以看到网络层次，就两个 dense layer，一个输入，一个输出：</p>
-<div class="note info">
-            <pre style="background: #fff; color: #555">Model: "sequential_1"_________________________________________________________________Layer (type)                 Output Shape              Param #   =================================================================dense_1 (Dense)              (None, 30)                270       _________________________________________________________________dense_2 (Dense)              (None, 1)                 31        =================================================================Total params: 301Trainable params: 301Non-trainable params: 0</pre>
-          </div>
-
-<h3 id="Train"><a href="#Train" class="headerlink" title="Train"></a>Train</h3><p>使用 <code>model.fit()</code> 开启训练。<code>with tf.Session() as sess:</code> 什么的，甚至 <code>tf.global_variables_initializer()</code> 什么的，这里不需要了：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">history = model.fit(x_train_scaled, y_train,</span><br><span class="line">                    validation_data = (x_valid_scaled, y_valid),</span><br><span class="line">                    epochs = <span class="number">100</span>,</span><br><span class="line">                    callbacks = callbacks)</span><br></pre></td></tr></table></figure>
-<h3 id="Plot"><a href="#Plot" class="headerlink" title="Plot"></a>Plot</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_learning_curves</span>(<span class="params">history</span>):</span></span><br><span class="line">    pd.DataFrame(history.history).plot(figsize=(<span class="number">8</span>,<span class="number">5</span>))</span><br><span class="line">    plt.grid(<span class="literal">True</span>)</span><br><span class="line">    plt.gca().set_ylim(<span class="number">0</span>,<span class="number">1</span>)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line">plot_learning_curves(history)</span><br></pre></td></tr></table></figure>
-<img src="/images/plot-regression.png" class="" title="Figure 1: Regression Plot" alt="plot-regression">
-
-
-<h3 id="Evaluate"><a href="#Evaluate" class="headerlink" title="Evaluate"></a>Evaluate</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.evaluate(x_test_scaled, y_test, verbose=<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
-<p>看一下测试集的结果：</p>
-<div class="note info">
-            <pre style="background: #fff; color: #555">0.3782297415326732</pre>
-          </div>
-
-<h2 id="Classification"><a href="#Classification" class="headerlink" title="Classification"></a>Classification</h2><h3 id="Dataset-amp-Data-Split"><a href="#Dataset-amp-Data-Split" class="headerlink" title="Dataset &amp; Data Split"></a>Dataset &amp; Data Split</h3><p>分类问题的数据集使用的是 Keras 的 <code>fashion_mnist</code>：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用 fashion_mnist 数据集</span></span><br><span class="line">fashion_mnist = keras.datasets.fashion_mnist</span><br><span class="line"></span><br><span class="line"><span class="comment">#导入训练集和测试集</span></span><br><span class="line">(x_train_all, y_train_all), (x_test, y_test) = fashion_mnist.load_data()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拆分训练集和验证集</span></span><br><span class="line">x_valid, x_train = x_train_all[<span class="number">0</span>:<span class="number">5000</span>], x_train_all[<span class="number">5000</span>:]</span><br><span class="line">y_valid, y_train = y_train_all[<span class="number">0</span>:<span class="number">5000</span>], y_train_all[<span class="number">5000</span>:]</span><br><span class="line"></span><br><span class="line">print(x_valid.shape, y_valid.shape) <span class="comment"># (5000, 28, 28) (5000,)</span></span><br><span class="line">print(x_train.shape, y_train.shape) <span class="comment"># (55000, 28, 28) (55000,)</span></span><br><span class="line">print(x_test.shape, y_test.shape) <span class="comment"># (10000, 28, 28) (10000,)</span></span><br></pre></td></tr></table></figure>
-<h3 id="Normalization-1"><a href="#Normalization-1" class="headerlink" title="Normalization"></a>Normalization</h3><p>由于 <code>fit_transform()</code> 要求输入的参数是一个二维矩阵，因此 <code>x_train</code> 的结构就要从 <code>[None, 28, 28]</code> 转换成 <code>[None, 784]</code>，接着再转回来，所以要 <code>reshape()</code> 两次：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line"></span><br><span class="line">scaler = StandardScaler()</span><br><span class="line"></span><br><span class="line">x_train_scaled = scaler.fit_transform(</span><br><span class="line">    x_train.astype(np.float32).reshape(-<span class="number">1</span>, <span class="number">1</span>)).reshape(-<span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)</span><br><span class="line">x_valid_scaled = scaler.transform(</span><br><span class="line">    x_valid.astype(np.float32).reshape(-<span class="number">1</span>, <span class="number">1</span>)).reshape(-<span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)</span><br><span class="line">x_test_scaled = scaler.transform(</span><br><span class="line">    x_test.astype(np.float32).reshape(-<span class="number">1</span>, <span class="number">1</span>)).reshape(-<span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)</span><br></pre></td></tr></table></figure>
-<h3 id="Model-1"><a href="#Model-1" class="headerlink" title="Model"></a>Model</h3><p>再次引起舒♂适。借助 <code>tf.keras</code> 的 API，搭建网络添加 layers 的时候，真的十分方便。方法也不止一种。例如，上面已经提到过的，通过给 <code>Sequential()</code> 传递一个 list 的形式：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">model = keras.models.Sequential([</span><br><span class="line">    keras.layers.Flatten(input_shape=[<span class="number">28</span>, <span class="number">28</span>]),</span><br><span class="line">    keras.layers.Dense(<span class="number">300</span>, activation=<span class="string">&quot;relu&quot;</span>),</span><br><span class="line">    keras.layers.Dense(<span class="number">100</span>, activation=<span class="string">&quot;relu&quot;</span>),</span><br><span class="line">    keras.layers.Dense(<span class="number">10</span>, activation=<span class="string">&quot;softmax&quot;</span>)</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">model.<span class="built_in">compile</span>(loss=<span class="string">&quot;sparse_categorical_crossentropy&quot;</span>,</span><br><span class="line">             optimizer = keras.optimizers.SGD(<span class="number">0.001</span>),</span><br><span class="line">             metrics = [<span class="string">&quot;accuracy&quot;</span>])</span><br></pre></td></tr></table></figure>
-<p>这里的 loss 函数用的是 <code>sparse_categorical_crossentropy</code>，因为数据集中的 y，都是一个个标量，例如 <code>y_train[0]</code> 的值是 <code>4</code>。而要计算 loss，就需要是向量，因此需要经过 One-Hot，转成向量才可以。</p>
-<p>另外，这里还可以通过调用 <code>add()</code> 函数来添加 layers：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">model = keras.models.Sequential()</span><br><span class="line">model.add(keras.layers.Flatten(input_shape=[<span class="number">28</span>, <span class="number">28</span>]))</span><br><span class="line">model.add(keras.layers.Dense(<span class="number">300</span>, activation=<span class="string">&quot;relu&quot;</span>))</span><br><span class="line">model.add(keras.layers.Dense(<span class="number">100</span>, activation=<span class="string">&quot;relu&quot;</span>))</span><br><span class="line">model.add(keras.layers.Dense(<span class="number">10</span>, activation=<span class="string">&quot;softmax&quot;</span>))</span><br></pre></td></tr></table></figure>
-<p>所以，这样一来，对于某些深度神经网络，就可以直接用 <code>for</code> 循环搭建，例如：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>):</span><br><span class="line">    model.add(keras.layers.Dense(<span class="number">100</span>, activation=<span class="string">&#x27;selu&#x27;</span>))</span><br></pre></td></tr></table></figure>
-<p>后面要是有别的 layer，直接跟上就可以了。</p>
-<h3 id="Train-1"><a href="#Train-1" class="headerlink" title="Train"></a>Train</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">history = model.fit(x_train_scaled, y_train,</span><br><span class="line">                    epochs=<span class="number">10</span>,</span><br><span class="line">                    validation_data=(x_valid_scaled, y_valid))</span><br></pre></td></tr></table></figure>
-<h3 id="Plot-1"><a href="#Plot-1" class="headerlink" title="Plot"></a>Plot</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_learning_curves</span>(<span class="params">history</span>):</span></span><br><span class="line">    pd.DataFrame(history.history).plot(figsize=(<span class="number">8</span>, <span class="number">5</span>))</span><br><span class="line">    plt.grid(<span class="literal">True</span>)</span><br><span class="line">    plt.gca().set_ylim(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    plt.show()</span><br><span class="line">    </span><br><span class="line">plot_learning_curves(history)</span><br></pre></td></tr></table></figure>
-<img src="/images/plot-classification.png" class="" title="Figure 1: Classification Plot" alt="plot-classification">
-
-<h3 id="Evaluate-1"><a href="#Evaluate-1" class="headerlink" title="Evaluate"></a>Evaluate</h3><p>结果大概看一下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.evaluate(x_test_scaled, y_test, verbose=<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
-<div class="note info">
-            <pre style="background: #fff; color: #555">[0.4324875540494919, 0.8463]</pre>
-          </div>
-
-<h2 id="关于-Callback-输出路径"><a href="#关于-Callback-输出路径" class="headerlink" title="关于 Callback 输出路径"></a>关于 Callback 输出路径</h2><p>模型训练的过程中，有遇到过一个 callback 输出路径的问题，应该算是 Tensorflow 的一个 bug。比如，当我想保存模型文件的时候，我会先建立一个路径：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">logdir = <span class="string">&quot;./callbacks&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(logdir):</span><br><span class="line">    os.mkdir(logdir)</span><br><span class="line">output_model_file = os.path.join(logdir, <span class="string">&quot;blahblah_model.h5&quot;</span>)</span><br><span class="line"></span><br><span class="line">callbacks = [</span><br><span class="line">    keras.callbacks.ModelCheckpoint(output_model_file,</span><br><span class="line">                                    save_best_only = <span class="literal">True</span>),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-<p>由于最近我使用的环境是 Windows，所以就遇到了这样的报错：</p>
-<div class="note danger">
-            <pre style="background: #fff; color: #555"><span style="color: #B22B31; font-weight: bold;">ProfilerNotRunningError</span>: Cannot stop profiling. No profiler is running.</pre>
-          </div>
-
-<p>说白了，就是不能有 <code>/</code>。这个问题在 Github 的一个 Issue<a href="#ref_3"><sup>3</sup></a> 上也有讨论。</p>
-<p>因此在 Mac 以及 Linux 环境下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logdir = <span class="string">&quot;./callbacks&quot;</span></span><br></pre></td></tr></table></figure>
-<p>而在 Windows 环境下请使用：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logdir = <span class="string">&quot;callbacks&quot;</span></span><br></pre></td></tr></table></figure>
-<p>最后不得不说：</p>
-<blockquote class="blockquote-center">
-            <i class="fa fa-quote-left"></i>
-            <p>Eager Mode, YES! </p>
-
-            <i class="fa fa-quote-right"></i>
-          </blockquote>
-
-<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://tensorflow.google.cn/api_docs/python/tf/keras">Google, TensorFlow API Module: tf.keras Overview</a></a></p>
-<p><a name="ref_2">[2] <a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html">scikit-learn API: sklearn.preprocessing.StandardScaler</a></a></p>
-<p><a name="ref_3">[3] <a target="_blank" rel="noopener" href="https://github.com/tensorflow/tensorboard/issues/2279">Github Issue, TensorFlow keras callback using tensorboard, “ProfilerNotRunningError: Cannot stop profiling. No profiler is running.” #2279</a></a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1351,7 +1281,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1364,7 +1294,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1405,7 +1335,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
