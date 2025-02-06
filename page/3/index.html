@@ -158,6 +158,95 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/30/Arduino-COM-set/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Alan Tanis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="K162">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/03/30/Arduino-COM-set/" class="post-title-link" itemprop="url">连接 Arduino 的 USB 串行设备设置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2018-03-30 20:07:16 / 修改时间：21:25:42" itemprop="dateCreated datePublished" datetime="2018-03-30T20:07:16+08:00">2018-03-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E8%80%85/" itemprop="url" rel="index"><span itemprop="name">开发者</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/03/30/Arduino-COM-set/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/03/30/Arduino-COM-set/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>最近购买了一块 Arduino UNO 开发板，今天到手后便立马开始尝鲜。但很快就遇到了问题。在 Windows 下，使用 Arduino IDE 编写好代码并准备上传至 Arduino 中时，IDE 报错并提示说：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">上传项目出错</span><br><span class="line">开发版在 COM1 不可用</span><br><span class="line">        Using Port                  : COM1</span><br><span class="line">        Using Programmer            : arduino</span><br><span class="line">        Overriding Baud Rate        : 115200</span><br><span class="line">avrdude: ser_open(): can&#39;t open device &quot;\\.\COM1&quot;: 系统找不到指定文件</span><br></pre></td></tr></table></figure>
+<p>在经过 <del>面向 Stack Overflow 编程</del> 搜索 Stack Overflow 的问答之后，发现是 USB 转串行通讯接口后的 COM 端口号不一致引起的。<a href="#ref_1"><sup>1</sup></a></p>
+<p>随后，我找到了两种解决方案。</p>
+<p>第一种办法是打开 Windows 的设备管理器，找到 端口（COM 和 LPT），选择 Arduino 相对应的 USB 串行设备，如 “USB 串行设备（COM2）”。打开其属性面板，切换至 <code>端口设置</code> 的标签页，有一个 <code>高级(A)...</code> 按钮，点击后出现高级设置页面，将底部的 <code>COM 端口号(P)</code> 设置为 <code>COM1</code> 即可。设置完毕后，需要断开 Arduino 的 USB 线缆，并重新连接。</p>
+<p>第二种办法则是在 Arduino IDE 中，选择顶部标签栏中的 <code>工具</code>，找到端口的设置选项。选择已连接的相应 COM 端口号即可。然后可直接编译并上传 IDE 中的程序。</p>
+<p>虽然仍未在 macOS 中尝试 Arduino IDE，但我猜测，在 macOS 中遇到类似问题时，第二种办法或许是较为有效便捷的解决途径。</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a name="ref_1">[1] <a target="_blank" rel="noopener" href="https://discussions.apple.com/thread/2767345">user65439, Answer for arduino nano-avrdude: ser_open(): system…</a></a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/09/exFAT-on-Mac/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -531,7 +620,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -544,7 +633,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -585,7 +674,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
